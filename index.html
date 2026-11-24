@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Herbal Shampoo Store</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f7f8f2;
+  color: #294536;
+}
+header {
+  background: #315b43;
+  color: white;
+  text-align: center;
+  padding: 35px 15px;
+}
+header h1 { font-size: 36px; margin: 0; }
+header p { margin-bottom: 0; }
+.hero {
+  text-align: center;
+  padding: 45px 15px;
+  background: #e5eddf;
+}
+.hero h2 { font-size: 30px; }
+button {
+  background: #315b43;
+  color: white;
+  border: 0;
+  padding: 12px 25px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.products {
+  max-width: 1000px;
+  margin: 35px auto;
+  padding: 15px;
+}
+.products h2 { text-align: center; }
+#product-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(230px,1fr));
+  gap: 22px;
+}
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 22px;
+  text-align: center;
+  box-shadow: 0 3px 12px #0001;
+}
+.card img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+}
+.price {
+  color: #b16a32;
+  font-size: 22px;
+  font-weight: bold;
+}
+footer {
+  background: #315b43;
+  color: white;
+  text-align: center;
+  padding: 22px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>HERBAL SHAMPOO</h1>
+  <p>Natural Hair Care | ดูแลเส้นผมด้วยธรรมชาติ</p>
+</header>
+
+<section class="hero">
+  <h2>สุขภาพผมดี เริ่มต้นจากธรรมชาติ</h2>
+  <p>เลือกแชมพูที่เหมาะกับเส้นผมของคุณ</p>
+  <button onclick="document.getElementById('products').scrollIntoView()">
+    เลือกซื้อสินค้า
+  </button>
+</section>
+
+<section class="products" id="products">
+  <h2>Our Products | สินค้าของเรา</h2>
+  <div id="product-list">กำลังโหลดสินค้า...</div>
+</section>
+
+<footer>
+  <p>HERBAL SHAMPOO STORE</p>
+  <p>Thank you for visiting our store</p>
+</footer>
+
+<script>
+const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPa9SEThfijoUN71uB55fp7GlKhkseQqHSNHQJ1fGiIzHj7t3NOpUJ8NzWiUsWLTHf8B7bLA-zkh09/pub?gid=0&single=true&output=csv";
+
+function parseCSV(text) {
+  return text.trim().split(/\r?\n/).map(line => {
+    return line.split(",").map(value => value.trim());
+  });
+}
+
+async function loadProducts() {
+  const container = document.getElementById("product-list");
+
+  try {
+    const response = await fetch(sheetURL);
+    if (!response.ok) throw new Error("โหลดข้อมูลไม่ได้");
+
+    const rows = parseCSV(await response.text());
+    const products = rows.slice(1);
+
+    container.innerHTML = products.map(p => `
+      <div class="card">
+        <h3>${p[1]}</h3>
+        <p>${p[3]}</p>
+        <p class="price">฿${p[2]}</p>
+        <p>รหัสสินค้า: ${p[0]}</p>
+      </div>
+    `).join("");
+
+  } catch (error) {
+    container.innerHTML = "ไม่สามารถโหลดสินค้าได้ กรุณาตรวจสอบ Google Sheets";
+  }
+}
+
+loadProducts();
+</script>
+</body>
+</html>
